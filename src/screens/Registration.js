@@ -16,74 +16,113 @@ import {
 import { Picker } from "@react-native-picker/picker";
 import MyBlur from "../components/MyBlur";
 
-import {getAuth,createUserWithEmailAndPassword } from 'firebase/auth'
-import { initializeApp } from "firebase/app";
-import { firebaseConfig } from '../../FirebaseConfig'
+import {getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+
+
+const auth = getAuth();
+const db = getFirestore()
 
 const Registration = ({ navigation }) => {
   const { height } = Dimensions.get("window");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [gender, setGender] = useState("");
-  const [diasEstrategia, setDiasEstrategia] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+    firstName: "",
+    lastName: "",
+    gender: "",
+    diasEstrategia: "",
+  });
 
-  const app = initializeApp(firebaseConfig)
-  const auth = getAuth(app)
-
-  const handleRegistration = async () => {
-    console.log("Comenzando registro de usuario");
-    if (password !== confirmPassword) {
-      Alert.alert("Error", "Las contraseñas no coinciden");
-      console.log("Las contraseñas no coinciden");
-      return;
-    }
-    try {
-      // Registrar al usuario en Firebase Auth
-      console.log("Registrando usuario en Firebase Auth");
-      const userCredential= await createUserWithEmailAndPassword(auth, email, password) 
-      const user= userCredential.user
-      console.log(user)
-      // Obtener el ID de usuario
-      
-
-      // Guardar campos adicionales en Firestore
-  
-      
-
-      console.log("Registro exitoso");
-
-      Alert.alert(
-        "Registro Exitoso",
-        "Por favor, revise su correo electrónico para completar el proceso de registro.",
-        [
-          {
-            text: "Ok",
-            onPress: () => {
-              // Redirigir al usuario a la pantalla de inicio de sesión
-              navigation.navigate("SignIn");
-            },
-          },
-        ]
-      );
-
-      // Registro exitoso, puedes redirigir al usuario a la pantalla de inicio
-    } catch (error) {
-      console.error("Error de registro:", error);
-      // Manejar errores aquí
-    }
-    // // createUserWithEmailAndPassword(auth, email, password)
-    // // .then(()=>{
-    // //   console.log('Cuenta creada')
-    // //   const user = userCredential.user
-    // //   console.log(user)
-    // })
-    // .catch(error =>{
-    //   console.log(error)
-    // })
+  const handleChangeText = (fieldName, value) => {
+    setFormData({ ...formData, [fieldName]: value });
   };
+
+  const validateForm = () => {
+    const errors={}
+    
+    
+      if (formData.password !== formData.confirmPassword) {
+        errors.password = "Las contraseñas no coinciden";
+      }
+      if (!formData.firstName || formData.firstName.length < 2) {
+        errors.firstName = "El nombre debe tener al menos 2 caracteres";
+      }
+      if (!formData.lastName || formData.lastName.length < 2) {
+        errors.lastName = "El apellido debe tener al menos 2 caracteres";
+      }
+    
+      const diasEstrategia = parseInt(formData.diasEstrategia);
+      if (!diasEstrategia || isNaN(diasEstrategia)) {
+        errors.diasEstrategia = "Este campo debe ser numérico";
+      }
+
+      
+    
+      return { isValid: Object.keys(errors).length === 0, errors };
+    }
+
+   
+
+    const handleRegistration = async () => {
+      const { isValid, errors } = validateForm();
+      if (!isValid) {
+        // Muestra los errores en la interfaz de usuario o como alertas según sea necesario
+        for (const key in errors) {
+          Alert.alert("Error", errors[key]);
+          console.log(errors[key]);
+        }
+        return;
+      }
+    
+      try {
+        // Registrar al usuario en Firebase Auth
+        console.log("Registrando usuario en Firebase Auth");
+        const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+        console.log("Registro exitoso");
+        
+        // Agreguemos un console.log para mostrar el UID del usuario
+        console.log("UID del usuario autenticado:", userCredential.user.uid);
+    
+        // Guardar los datos adicionales en Firestore
+        console.log("Guardando datos adicionales en Firestore");
+        const userId = userCredential.user.uid; // Asegúrate de que el UID sea correcto
+        const userDocData = {
+          email: formData.email,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          gender: formData.gender,
+          diasEstrategia: formData.diasEstrategia,
+          userId: userId,
+        };
+    
+        // Agreguemos un console.log para mostrar los datos antes de guardarlos
+        console.log("Datos a guardar en Firestore:", userDocData);
+    
+        const userDocRef = await addDoc(collection(db, "users"), userDocData);
+        console.log("Registro exitoso");
+    
+        Alert.alert(
+          "Registro Exitoso",
+          "Por favor, revise su correo electrónico para completar el proceso de registro.",
+          [
+            {
+              text: "Ok",
+              onPress: () => {
+                // Redirigir al usuario a la pantalla de inicio de sesión
+                navigation.navigate("SignIn");
+              },
+            },
+          ]
+        );
+    
+        // Registro exitoso, puedes redirigir al usuario a la pantalla de inicio
+      } catch (error) {
+        console.error("Error de registro:", error);
+        // Manejar errores aquí
+      }
+    };
 
   return (
     <>
@@ -93,53 +132,53 @@ const Registration = ({ navigation }) => {
           <View style={styles.contentContainer}>
             <Text style={styles.title}>Registrate</Text>
             <TextInput
-              value={email}
+              value={formData.email}
               style={styles.input}
               placeholder="Tu Email"
               autoCapitalize="none"
-              onChangeText={(text) => setEmail(text)}
+              onChangeText={(text) => handleChangeText("email", text)}
               autoCorrect={false}
             />
             <TextInput
-              value={password}
+              value={formData.password}
               style={styles.input}
               placeholder="Tu Contraseña"
               autoCapitalize="none"
-              onChangeText={(text) => setPassword(text)}
+              onChangeText={(text) => handleChangeText("password", text)}
               autoCorrect={false}
               secureTextEntry={true}
             />
 
 <TextInput
-              value={confirmPassword}
+              value={formData.confirmPassword}
               style={styles.input}
               placeholder="Repite Tu Contraseña"
               autoCapitalize="none"
-              onChangeText={(text) => setConfirmPassword(text)}
+              onChangeText={(text) => handleChangeText("confirmPassword", text)}
               autoCorrect={false}
               secureTextEntry={true}
             />
 
             <TextInput
-              value={firstName}
+              value={formData.firstName}
               style={styles.input}
               placeholder="Tu Nombre"
               autoCapitalize="none"
-              onChangeText={(text) => setFirstName(text)}
+              onChangeText={(text) => handleChangeText("firstName", text)}
               autoCorrect={false}
             />
             <TextInput
-              value={lastName}
+              value={formData.lastName}
               style={styles.input}
               placeholder="Tu Apellido"
               autoCapitalize="none"
-              onChangeText={(text) => setLastName(text)}
+              onChangeText={(text) => handleChangeText("lastName", text)}
               autoCorrect={false}
             />
             <Text>Género:</Text>
             <Picker
-              selectedValue={gender}
-              onValueChange={(itemValue) => setGender(itemValue)}
+              selectedValue={formData.gender}
+              onValueChange={(itemValue) => handleChangeText("gender", itemValue)}
             >
               <Picker.Item label="Selecciona" value="" />
               <Picker.Item label="Masculino" value="Masculino" />
@@ -147,10 +186,10 @@ const Registration = ({ navigation }) => {
               <Picker.Item label="Otro" value="Otro" />
             </Picker>
             <TextInput
-              value={diasEstrategia}
+              value={formData.diasEstrategia}
               style={styles.input}
               placeholder="Días Aplicando la Estrategia"
-              onChangeText={(text) => setDiasEstrategia(text)}
+              onChangeText={(text) => handleChangeText("diasEstrategia", text)}
               keyboardType="numeric"
             />
             <>

@@ -9,31 +9,31 @@ import {
   View,
   Dimensions,
 } from "react-native";
-import { firebaseConfig } from "../../FirebaseConfig";
+
 import MyBlur from "../components/MyBlur";
 import itro from "../../assets/itro.png";
 import 'firebase/firestore'
-import {getAuth,createUserWithEmailAndPassword } from 'firebase/auth' // Importa onAuthStateChanged
+import {getAuth,  onAuthStateChanged} from 'firebase/auth' // Importa onAuthStateChanged
 import { useNavigation } from "@react-navigation/native";
-import { initializeApp } from "firebase/app";
 
+const auth = getAuth()
 
 const Welcome = () => {
   const navigation = useNavigation()
   const { height } = Dimensions.get("window");
+  
+  useEffect(() => {
+    // Verifica el estado de autenticación al cargar la pantalla Welcome
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Si el usuario está autenticado, redirige a HomeScreen
+        navigation.navigate("HomeScreen");
+      }
+     });
 
-  // useEffect(() => {
-  //   // Verifica el estado de autenticación al cargar la pantalla Welcome
-  //   const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (user) => {
-  //     if (user) {
-  //       // Si el usuario está autenticado, redirige a HomeScreen
-  //       navigation.navigate("HomeScreen");
-  //     }
-  // //   });
-
-  //   // Limpia el efecto cuando se desmonta el componente
-  //   return unsubscribe;
-  // }, []);
+    // Limpia el efecto cuando se desmonta el componente
+    return unsubscribe;
+  }, []);
 
   const navigateToRegistration = () => {
     // Navega a la pantalla de registro (Registration)

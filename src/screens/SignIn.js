@@ -14,10 +14,11 @@ import {
 } from "react-native";
 import MyBlur from "../components/MyBlur";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { initializeApp } from "firebase/app";
+
 import Loading from "../components/Loading";
 import { useNavigation } from "@react-navigation/native";
-import { firebaseConfig } from "../../FirebaseConfig";
+
+const auth = getAuth();
 
 const SignIn = () => {
   const { height } = Dimensions.get("window");
@@ -25,8 +26,8 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+
+
 
   const navigation = useNavigation(); // Obtiene la instancia de navegación
 
@@ -43,15 +44,7 @@ const SignIn = () => {
     } finally {
       setLoading(false);
     }
-    // signInWithEmailAndPassword(auth, email, password)
-    // .then(()=>{
-    //   console.log('Logueado ok')
-    //   const user = userCredential.user
-    //   console.log(user)
-    // })
-    // .catch(error=>{
-    //   console.log(error)
-    // })
+   
   };
 
   return (
