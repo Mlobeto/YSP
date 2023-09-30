@@ -6,22 +6,19 @@ import {
   TextInput,
   StyleSheet,
   Text,
-  Image,
   View,
   Alert,
   Dimensions,
-  ActivityIndicator,
-  Button,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import MyBlur from "../components/MyBlur";
 
-import {getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
-import { getFirestore, collection, addDoc } from "firebase/firestore";
-
-
-const auth = getAuth();
-const db = getFirestore()
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+} from "firebase/auth";
+import { collection, addDoc, doc, setDoc  } from "firebase/firestore";
+import { auth, database } from "../../FirebaseConfig";
 
 const Registration = ({ navigation }) => {
   const { height } = Dimensions.get("window");
@@ -40,89 +37,79 @@ const Registration = ({ navigation }) => {
   };
 
   const validateForm = () => {
-    const errors={}
-    
-    
-      if (formData.password !== formData.confirmPassword) {
-        errors.password = "Las contraseñas no coinciden";
-      }
-      if (!formData.firstName || formData.firstName.length < 2) {
-        errors.firstName = "El nombre debe tener al menos 2 caracteres";
-      }
-      if (!formData.lastName || formData.lastName.length < 2) {
-        errors.lastName = "El apellido debe tener al menos 2 caracteres";
-      }
-    
-      const diasEstrategia = parseInt(formData.diasEstrategia);
-      if (!diasEstrategia || isNaN(diasEstrategia)) {
-        errors.diasEstrategia = "Este campo debe ser numérico";
-      }
+    const errors = {};
 
-      
-    
-      return { isValid: Object.keys(errors).length === 0, errors };
+    if (formData.password !== formData.confirmPassword) {
+      errors.password = "Las contraseñas no coinciden";
+    }
+    if (!formData.firstName || formData.firstName.length < 2) {
+      errors.firstName = "El nombre debe tener al menos 2 caracteres";
+    }
+    if (!formData.lastName || formData.lastName.length < 2) {
+      errors.lastName = "El apellido debe tener al menos 2 caracteres";
     }
 
-   
+    const diasEstrategia = parseInt(formData.diasEstrategia);
+    if (!diasEstrategia || isNaN(diasEstrategia)) {
+      errors.diasEstrategia = "Este campo debe ser numérico";
+    }
 
-    const handleRegistration = async () => {
-      const { isValid, errors } = validateForm();
-      if (!isValid) {
-        // Muestra los errores en la interfaz de usuario o como alertas según sea necesario
-        for (const key in errors) {
-          Alert.alert("Error", errors[key]);
-          console.log(errors[key]);
-        }
-        return;
-      }
-    
-      try {
-        // Registrar al usuario en Firebase Auth
-        console.log("Registrando usuario en Firebase Auth");
-        const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-        console.log("Registro exitoso");
-        
-        // Agreguemos un console.log para mostrar el UID del usuario
-        console.log("UID del usuario autenticado:", userCredential.user.uid);
-    
-        // Guardar los datos adicionales en Firestore
-        console.log("Guardando datos adicionales en Firestore");
-        const userId = userCredential.user.uid; // Asegúrate de que el UID sea correcto
-        const userDocData = {
-          email: formData.email,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          gender: formData.gender,
-          diasEstrategia: formData.diasEstrategia,
-          userId: userId,
-        };
-    
-        // Agreguemos un console.log para mostrar los datos antes de guardarlos
-        console.log("Datos a guardar en Firestore:", userDocData);
-    
-        const userDocRef = await addDoc(collection(db, "users"), userDocData);
-        console.log("Registro exitoso");
-    
-        Alert.alert(
-          "Registro Exitoso",
-          "Por favor, revise su correo electrónico para completar el proceso de registro.",
-          [
-            {
-              text: "Ok",
-              onPress: () => {
-                // Redirigir al usuario a la pantalla de inicio de sesión
-                navigation.navigate("SignIn");
-              },
+    return { isValid: Object.keys(errors).length === 0, errors };
+  };
+
+  const handleRegistration = async () => {
+    try {
+      console.log("Registrando usuario en Firebase Auth");
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+  
+      console.log("Registro exitoso");
+      console.log("UID del usuario autenticado:", userCredential.user.uid);
+  
+      console.log("Guardando datos adicionales en Firestore");
+  
+      // Utilizar el mismo UID del usuario como ID del documento
+      const userDocRef = doc(database, "users", userCredential.user.uid);
+  
+      await setDoc(userDocRef, {
+        email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        gender: formData.gender,
+        diasEstrategia: formData.diasEstrategia,
+        userId: userCredential.user.uid,
+      });
+  
+      console.log("Registro en Firestore exitoso");
+  
+      // Puedes agregar lógica adicional aquí si es necesario
+  
+      Alert.alert(
+        "Registro Exitoso",
+        "Por favor, revise su correo electrónico para completar el proceso de registro.",
+        [
+          {
+            text: "Ok",
+            onPress: () => {
+              // Redirigir al usuario a la pantalla de inicio de sesión
+              navigation.navigate("SignIn");
             },
-          ]
-        );
-    
-        // Registro exitoso, puedes redirigir al usuario a la pantalla de inicio
-      } catch (error) {
+          },
+        ]
+      );
+    } catch (error) {
+      if (error.code === "auth/email-already-in-use") {
+        console.log("La dirección de correo electrónico ya está en uso.");
+        // Puedes mostrar un mensaje al usuario aquí
+      } else {
         console.error("Error de registro:", error);
-        // Manejar errores aquí
       }
-    };
+    }
+  };
+  
 
   return (
     <>
@@ -149,7 +136,7 @@ const Registration = ({ navigation }) => {
               secureTextEntry={true}
             />
 
-<TextInput
+            <TextInput
               value={formData.confirmPassword}
               style={styles.input}
               placeholder="Repite Tu Contraseña"
@@ -178,7 +165,9 @@ const Registration = ({ navigation }) => {
             <Text>Género:</Text>
             <Picker
               selectedValue={formData.gender}
-              onValueChange={(itemValue) => handleChangeText("gender", itemValue)}
+              onValueChange={(itemValue) =>
+                handleChangeText("gender", itemValue)
+              }
             >
               <Picker.Item label="Selecciona" value="" />
               <Picker.Item label="Masculino" value="Masculino" />
@@ -193,21 +182,16 @@ const Registration = ({ navigation }) => {
               keyboardType="numeric"
             />
             <>
-              
               <TouchableOpacity
                 onPress={() => {
-                handleRegistration()
-                navigation.navigate("SignIn")
+                  handleRegistration();
+                  // No es necesario navegar a SignIn aquí, ya que el redireccionamiento ocurre después de un registro exitoso
                 }}
                 style={styles.signInButton}
               >
-                <Text style={{ color: "white", fontWeight: "bold" }}>
-                  Ok
-                </Text>
+                <Text style={{ color: "white", fontWeight: "bold" }}>Ok</Text>
               </TouchableOpacity>
             </>
-            
-            
           </View>
         </ScrollView>
       </SafeAreaView>

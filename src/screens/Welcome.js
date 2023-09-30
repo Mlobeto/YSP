@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"; // Importa useEffect desde React
+import React, { useEffect } from "react"; 
 import {
   SafeAreaView,
   TouchableOpacity,
@@ -12,34 +12,19 @@ import {
 
 import MyBlur from "../components/MyBlur";
 import itro from "../../assets/itro.png";
-import 'firebase/firestore'
-import {getAuth,  onAuthStateChanged} from 'firebase/auth' // Importa onAuthStateChanged
+import "firebase/firestore";
+import { getAuth} from "firebase/auth"; 
 import { useNavigation } from "@react-navigation/native";
 
-const auth = getAuth()
+import { auth } from "../../FirebaseConfig";
+
+
 
 const Welcome = () => {
-  const navigation = useNavigation()
+  const navigation = useNavigation();
   const { height } = Dimensions.get("window");
-  
-  useEffect(() => {
-    // Verifica el estado de autenticación al cargar la pantalla Welcome
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // Si el usuario está autenticado, redirige a HomeScreen
-        navigation.navigate("HomeScreen");
-      }
-     });
 
-    // Limpia el efecto cuando se desmonta el componente
-    return unsubscribe;
-  }, []);
-
-  const navigateToRegistration = () => {
-    // Navega a la pantalla de registro (Registration)
-    navigation.navigate("Registration");
-  };
-
+ 
   return (
     <>
       <MyBlur />
@@ -57,7 +42,7 @@ const Welcome = () => {
             <Text style={styles.title}>
               ¿Quieres Recuperarte de una Ruptura?
             </Text>
-            
+
             <Text style={styles.title2}>
               ¿Quieres Comprobar el Interés de tu Ex?
             </Text>
@@ -66,10 +51,8 @@ const Welcome = () => {
               Aquí encontrarás una guía para lograrlo!
             </Text>
             <View style={styles.buttonContainer}>
-              
-
               <TouchableOpacity
-                onPress={navigateToRegistration}
+                onPress={()=> navigation.navigate('SignIn')}
                 style={styles.button2}
               >
                 <Text style={styles.buttonsText}>Ingresa</Text>
@@ -81,7 +64,6 @@ const Welcome = () => {
     </>
   );
 };
-
 
 export default Welcome;
 

@@ -1,18 +1,21 @@
-import { initializeApp } from 'firebase/app';
-import {getAuth} from 'firebase/auth'
-import { getFirestore } from "firebase/firestore";
+import {initializeApp} from 'firebase/app'
+import { getAuth } from 'firebase/auth'
+import {getFirestore} from 'firebase/firestore'
+import Constants from 'expo-constants'
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDuykRasFoN0P9vmaQFuh7-A_c5FZd0qL0",
-  authDomain: "nysp-f04e4.firebaseapp.com",
-  projectId: "nysp-f04e4",
-  storageBucket: "nysp-f04e4.appspot.com",
-  messagingSenderId: "522119906082",
-  appId: "1:522119906082:web:3a8a9c2de8fca45ebb5b7b"
+  apiKey: Constants.expoConfig.extra?.API_KEY,
+  authDomain: Constants.expoConfig.extra?.AUTH_DOMAIN,
+  projectId: Constants.expoConfig.extra?.PROJECT_ID,
+  storageBucket: Constants.expoConfig.extra?.STORAGE_BUCKET,
+  messagingSenderId: Constants.expoConfig.extra?.MESSAGING_SENDER_ID,
+  appId: Constants.expoConfig.extra?.APP_ID,
+  databaseURL: Constants.expoConfig.extra?.DB_URL
 };
+initializeApp(firebaseConfig)
+export const auth = getAuth()
+export const database = getFirestore()
 
-const app = initializeApp(firebaseConfig);
-const auth =getAuth(app)
-const db= getFirestore(app)
+
 
 

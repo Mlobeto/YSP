@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   SafeAreaView,
   TouchableOpacity,
@@ -12,39 +12,30 @@ import {
   ActivityIndicator,
   Button,
 } from "react-native";
+import {Alert} from 'react-native'
 import MyBlur from "../components/MyBlur";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-
-import Loading from "../components/Loading";
+import { signInWithEmailAndPassword} from "firebase/auth";
+import {auth} from '../../FirebaseConfig'
 import { useNavigation } from "@react-navigation/native";
 
-const auth = getAuth();
 
-const SignIn = () => {
+export default function SignIn({navigation}){
+  
   const { height } = Dimensions.get("window");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  //[isUserLoggedIn, setIsUserLoggedIn] = useState(false)
 
 
-
-
-  const navigation = useNavigation(); // Obtiene la instancia de navegación
-
-  const handleSignIn = async () => {
-    setLoading(true);
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      // Si la autenticación es exitosa, redirige al usuario a la pantalla HomeScreen
-      navigation.navigate("HomeScreen");
-    } catch (error) {
-      console.log(error);
-      alert("Algo falló: " + error.message);
-      console.error("Error de inicio de sesión:", error);
-    } finally {
-      setLoading(false);
+  const onHandleLogin = () => {
+    if (email !== "" && password !== "") {
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          console.log('LogIn Exitoso');
+          navigation.navigate('HomeScreen');
+        })
+        .catch((err) => Alert.alert("No pudiste loguearte", err.message));
     }
-   
   };
 
   return (
@@ -53,9 +44,10 @@ const SignIn = () => {
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.container}>
           <View style={styles.contentContainer}>
-            <Loading isVisible={true} text="Cargando..." />
+          
+            
             <Text style={styles.title}>Hola nuevamente!</Text>
-            <Text style={styles.title2}></Text>
+            
 
             <TextInput
               value={email}
@@ -74,9 +66,9 @@ const SignIn = () => {
               autoCorrect={false}
               secureTextEntry={true}
             />
-            {loading ? (
+            {/* {loading ? (
               <ActivityIndicator size="large" color="#0000ff" />
-            ) : (
+            ) : ( */}
               <>
                 <TouchableOpacity>
                   <Text
@@ -95,7 +87,7 @@ const SignIn = () => {
 
                 <TouchableOpacity
                   onPress={() => {
-                    handleSignIn();
+                    onHandleLogin();
                   }}
                   style={styles.signInButton}
                 >
@@ -103,8 +95,24 @@ const SignIn = () => {
                     Ingresar
                   </Text>
                 </TouchableOpacity>
+                <View>
+                 <Text style={styles.title3}>No tienes una cuenta? </Text>
+                 <TouchableOpacity onPress={()=> navigation.navigate('Registration')} >
+                 <Text
+                    style={[
+                      styles.buttonsText,
+                      {
+                        fontWeight: "bold",
+                        lineHeight: 30,
+                        textAlign: "center",
+                      },
+                    ]}
+                  >
+                     Regístrate Aquí </Text>
+                  </TouchableOpacity>
+                </View>
               </>
-            )}
+            {/* )} */}
 
             <Text
               style={{
@@ -143,7 +151,7 @@ const SignIn = () => {
     </>
   );
 };
-export default SignIn;
+
 
 const styles = StyleSheet.create({
   container: {
@@ -175,6 +183,12 @@ const styles = StyleSheet.create({
   },
   title2: {
     fontSize: 23,
+    fontWeight: "500",
+    textAlign: "center",
+    color: "#6d6875",
+  },
+  title3: {
+    fontSize: 18,
     fontWeight: "500",
     textAlign: "center",
     color: "#6d6875",

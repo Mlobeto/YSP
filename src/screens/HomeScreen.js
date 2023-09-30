@@ -1,69 +1,120 @@
 import React, { useRef, useState, useEffect } from "react";
-import { View } from "react-native";
+import {
+  SafeAreaView,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import Svg, { Circle, Text as SvgText } from "react-native-svg";
+import MyBlurDos from "../components/MyBlurDos";
+import { AntDesign } from "@expo/vector-icons";
+import Animated, {useSharedValue, useAnimatedProps, withTiming} from 'react-native-reanimated'
+import Desafio from "../components/desafio";
+import { auth, database } from "../../FirebaseConfig";
+import { useNavigation } from "@react-navigation/native";
+import { collection, getDoc, doc } from "firebase/firestore";
 
 const HomeScreen = () => {
-  const circleRef = useRef();
-  const [progress, setProgress] = useState(0); // Progreso calculado en base al tiempo transcurrido
-
-  const radius = 50;
-  const circumference = 2 * Math.PI * radius;
-  const startDate = new Date("2023-08-15"); // Fecha de inicio
-  const currentDate = new Date();
-  const timeDifference = currentDate - startDate;
-  const daysPassed = Math.min(
-    Math.floor(timeDifference / (1000 * 60 * 60 * 24)),
-    21
-  ); // Máximo 21 días
-  const calculatedProgress = daysPassed / 21; // 21 días en total
+  const [userInfo, setUserInfo] = useState(null);
 
   useEffect(() => {
-    setProgress(calculatedProgress);
-  }, []);
+    // Dentro del useEffect en HomeScreen
+const fetchUserInfo = async () => {
+  try {
+    // Obtener el UID del usuario actualmente autenticado
+    const userId = auth.currentUser.uid;
+    console.log("User ID:", userId);
 
-  const strokeDashoffset = (1 - progress) * circumference;
+    // Construir la referencia al documento del usuario
+    const userRef = doc(database, "users", userId);
+    console.log("Document ID:", userRef.id);
 
-  return (
-    <View>
-      <Svg width={2 * radius} height={2 * radius}>
-        {/* Círculo semitransparente de fondo */}
-        <Circle
-          cx={radius}
-          cy={radius}
-          r={radius}
-          fill="rgba(230, 126, 34, 0.3)"
-        />
-        {/* Círculo de progreso */}
-        <Circle
-          cx={radius}
-          cy={radius}
-          r={radius}
-          fill="transparent"
-          stroke="#E67E22"
-          strokeWidth={10}
-          strokeDasharray={`${circumference} ${circumference}`}
-          strokeDashoffset={strokeDashoffset}
-          ref={circleRef}
-        />
-        {/* Etiquetas para los días */}
+    const userDoc = await getDoc(userRef);
+    if (userDoc.exists()) {
+      // Si el documento del usuario existe, obtener la información y establecerla en el estado
+      const userData = userDoc.data();
+      setUserInfo(userData);
+    } else {
+      console.log("El documento del usuario no existe en Firestore.");
+    }
 
-        <SvgText
-          x={radius * 2 - 15}
-          y={radius}
-          textAnchor="middle"
-          fill="black"
-        >
-          Día 1
-        </SvgText>
-        {/* Mensaje especial en el día 21 */}
-        {daysPassed >= 21 && (
-          <SvgText x={radius} y={radius + 5} textAnchor="middle" fill="#E67E22">
-            ¡Lo lograste!
-          </SvgText>
-        )}
-      </Svg>
-    </View>
-  );
+  } catch (error) {
+    console.error("Error al recuperar la información del usuario:", error);
+  }
 };
 
+// Llamar a la función para cargar la información del usuario
+fetchUserInfo();
+
+  }, []);
+  
+  
+
+  return (
+    <>
+      <MyBlurDos />
+       <SafeAreaView style={styles.container}>
+       <Text style={styles.title}>
+          {userInfo ? `Hola Querid@ ${userInfo.firstName}. Llevas ${userInfo.diasEstrategia} días aplicando la estrategia` : "Bienvenid@. Cargando información..."}
+        </Text>
+     
+            <View style={styles.centerContainer}>
+          <View style={styles.desafio}>
+            <Desafio />
+          </View>
+          <TouchableOpacity style={styles.button2}>
+            <Text style={styles.signInButton}>CACHORRIE</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </>
+  );
+};
 export default HomeScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "transparent",
+    justifyContent: "center",
+  },
+  centerContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  title: {
+    marginTop: 50,
+    fontSize: 20,
+    fontWeight: "700",
+    lineHeight: 50,
+    textAlign: "center",
+    color: "#6d6875",
+  },
+  button2: {
+    alignItems: "center",
+    padding: 15,
+    marginTop: 20, // Ajusta este valor según sea necesario
+  },
+  signInButton: {
+    backgroundColor: "#00b4d8",
+    padding: 10,
+    borderRadius: 12,
+    alignItems: "center",
+    marginVertical: 10,
+    shadowColor: "#00b4d8",
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.44,
+    shadowRadius: 10.32,
+  },
+  desafio: {
+    marginTop: -40, // Ajusta este valor según sea necesario
+    borderRadius: 10,
+    alignItems: "center",
+  },
+});

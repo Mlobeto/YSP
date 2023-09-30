@@ -1,3 +1,4 @@
-node_modules
-FirebaseConfig
-package-lock
+node_modules/
+.FirebaseConfig
+.package-lock.json
+.env
