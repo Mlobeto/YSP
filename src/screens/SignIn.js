@@ -16,7 +16,7 @@ import {Alert} from 'react-native'
 import MyBlur from "../components/MyBlur";
 import { signInWithEmailAndPassword} from "firebase/auth";
 import {auth} from '../../FirebaseConfig'
-import { useNavigation } from "@react-navigation/native";
+
 
 
 export default function SignIn({navigation}){
@@ -32,7 +32,7 @@ export default function SignIn({navigation}){
       signInWithEmailAndPassword(auth, email, password)
         .then(() => {
           console.log('LogIn Exitoso');
-          navigation.navigate('HomeScreen');
+          navigation.navigate('Welcome');
         })
         .catch((err) => Alert.alert("No pudiste loguearte", err.message));
     }

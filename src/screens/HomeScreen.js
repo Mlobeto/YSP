@@ -3,34 +3,70 @@ import {
   SafeAreaView,
   TouchableOpacity,
   ScrollView,
+  Modal,
   StyleSheet,
   Text,
   View,
+  Button
 } from "react-native";
 import Svg, { Circle, Text as SvgText } from "react-native-svg";
 import MyBlurDos from "../components/MyBlurDos";
 import { AntDesign } from "@expo/vector-icons";
 import Animated, {useSharedValue, useAnimatedProps, withTiming} from 'react-native-reanimated'
-import Desafio from "../components/desafio";
+import Desafio from "../components/Desafio";
 import { auth, database } from "../../FirebaseConfig";
-import { useNavigation } from "@react-navigation/native";
-import { collection, getDoc, doc } from "firebase/firestore";
+import { getDoc, doc, updateDoc } from "firebase/firestore";
 
-const HomeScreen = () => {
+export default function HomeScreen ({navigation}){
   const [userInfo, setUserInfo] = useState(null);
+  const [isModalVisible, setModalVisible] = useState(false)
+  
+  
+  const handleNavigation = (screenName) => {
+    if (!isModalVisible) {
+      navigation.navigate(screenName);
+    }
+  };
 
-  useEffect(() => {
-    // Dentro del useEffect en HomeScreen
-const fetchUserInfo = async () => {
+const openModal =()=> {
+  setModalVisible(true)
+}
+const closeModal =()=>{
+  setModalVisible(false)
+}
+
+const resetCount = async () => {
   try {
     // Obtener el UID del usuario actualmente autenticado
     const userId = auth.currentUser.uid;
-    console.log("User ID:", userId);
 
     // Construir la referencia al documento del usuario
     const userRef = doc(database, "users", userId);
-    console.log("Document ID:", userRef.id);
 
+    // Actualizar el documento en Firestore
+    await updateDoc(userRef, {
+      diasEstrategia: 0, // Puedes cambiar esto según tus necesidades
+    });
+
+    // Actualizar el estado local
+    setUserInfo((prevUserInfo) => ({
+      ...prevUserInfo,
+      diasEstrategia: 0,
+    }));
+
+    // Cerrar el modal después de actualizar la cuenta
+    closeModal();
+  } catch (error) {
+    console.error("Error al reiniciar la cuenta:", error);
+  }
+};
+  useEffect(() => {
+const fetchUserInfo = async () => {
+  try {
+    const userId = auth.currentUser.uid;
+    console.log("User ID:", userId);
+    const userRef = doc(database, "users", userId);
+    console.log("Document ID:", userRef.id);
     const userDoc = await getDoc(userRef);
     if (userDoc.exists()) {
       // Si el documento del usuario existe, obtener la información y establecerla en el estado
@@ -60,19 +96,42 @@ fetchUserInfo();
           {userInfo ? `Hola Querid@ ${userInfo.firstName}. Llevas ${userInfo.diasEstrategia} días aplicando la estrategia` : "Bienvenid@. Cargando información..."}
         </Text>
      
-            <View style={styles.centerContainer}>
+        <View style={styles.centerContainer}>
           <View style={styles.desafio}>
             <Desafio />
           </View>
-          <TouchableOpacity style={styles.button2}>
+          <TouchableOpacity style={styles.button2} onPress={openModal}>
             <Text style={styles.signInButton}>CACHORRIE</Text>
           </TouchableOpacity>
-        </View>
+          
+          <TouchableOpacity
+            style={styles.button2}
+            onPress={() => handleNavigation("Formulario")}
+          >
+            <Text style={styles.signInButton}>Repasar mi Estrategia</Text>
+          </TouchableOpacity>
+        </View>  
+       
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isModalVisible}
+          onRequestClose={closeModal}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text>¿Estás segur@ de comenzar desde cero?</Text>
+              <Button title="Confirmar" onPress={resetCount} />
+              <Button title="Cancelar" onPress={closeModal} />
+            </View>
+            
+          </View>
+        </Modal>
       </SafeAreaView>
     </>
   );
 };
-export default HomeScreen;
+
 
 const styles = StyleSheet.create({
   container: {
@@ -116,5 +175,18 @@ const styles = StyleSheet.create({
     marginTop: -40, // Ajusta este valor según sea necesario
     borderRadius: 10,
     alignItems: "center",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 22,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 4,
+    borderColor: "rgba(0, 0, 0, 0.1)",
   },
 });

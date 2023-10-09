@@ -7,7 +7,15 @@ import { onAuthStateChanged } from "firebase/auth";
 import Welcome from "./src/screens/Welcome";
 import Registration from "./src/screens/Registration";
 import SignIn from "./src/screens/SignIn";
-import HomeScreen from "./src/screens/HomeScreen";
+import VerEpisodios from "./src/screens/VerEpisodios";
+import HomeScreen from './src/screens/HomeScreen'
+import MasRecursos from "./src/screens/MasRecursos";
+import ListasPrimerosPasos from './src/screens/ListasPrimerosPasos' 
+import ListasUltimosPasos from './src/screens/ListasUltimosPasos'
+import ListasEspeciales from './src/screens/ListasEspeciales'
+import Formulario from "./src/screens/Formulario";
+
+
 import { auth } from "./FirebaseConfig";
 
 // ... Importaciones y constantes ...
@@ -47,22 +55,28 @@ const AuthenticatedUserProvider = ({ children }) => {
 
 function YSPApp() {
   return (
-    <Stack.Navigator initialRouteName="HomeScreen">
-      <Stack.Screen name="HomeScreen" component={HomeScreen} />
+    <Stack.Navigator initialRouteName="Welcome">
+      <Stack.Screen name="Welcome" component={Welcome} />
     </Stack.Navigator>
   );
 }
 
 
 function AuthStack() {
-  return (
-    <Stack.Navigator initialRouteName="SignIn">
-      <Stack.Screen name="SignIn" component={SignIn} />
-      <Stack.Screen name="Registration" component={Registration} />
-      <Stack.Screen name="HomeScreen" component={HomeScreen} />
-    </Stack.Navigator>
-  );
-}
+  return(
+  <Stack.Navigator >
+     <Stack.Screen name="SignIn" component={SignIn} /> 
+     <Stack.Screen name="Welcome" component={Welcome} />
+     <Stack.Screen name="Registration" component={Registration} />
+     <Stack.Screen name="VerEpisodios" component={VerEpisodios} />
+     <Stack.Screen name="HomeScreen" component={HomeScreen} />
+     <Stack.Screen name="ListasPrimerosPasos" component={ListasPrimerosPasos} /> 
+     <Stack.Screen name="ListasUltimosPasos" component={ListasUltimosPasos} />
+     <Stack.Screen name="ListasEspeciales" component={ListasEspeciales} />
+     <Stack.Screen name="MasRecursos" component={MasRecursos} />
+     <Stack.Screen name="Formulario" component={Formulario}/>
+  </Stack.Navigator>
+)}
 
 export default function App() {
   const { user, setUser } = useContext(AuthenticatedUserContext);
@@ -104,6 +118,7 @@ export default function App() {
     </AuthenticatedUserProvider>
   );
 }
+
 
 
 

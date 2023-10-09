@@ -4,16 +4,17 @@ import YoutubePlayer from 'react-native-youtube-iframe'
 
 
 
-export default function VerEpisodios() {
+export default function MasRecursos() {
  
   return (
     <View >
+    <Text>Mas Recursos</Text>
         
-    <YoutubePlayer
+    {/* <YoutubePlayer
       height={300}
       play={false}
       videoId={'AJA9UELSDAw'}
-     />
+     /> */}
     </View>
      
   

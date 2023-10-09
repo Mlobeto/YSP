@@ -27,6 +27,14 @@ export default {
     web: {
       favicon: "./assets/favicon.png",
     },
+    plugins: [
+      [
+        "expo-av",
+        {
+          microphonePermission: "Allow $(PRODUCT_NAME) to access your microphone."
+        }
+      ]
+    ],
     extra: {
       API_KEY: process.env.API_KEY,
       AUTH_DOMAIN: process.env.AUTH_DOMAIN,

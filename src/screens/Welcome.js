@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"; 
+import React, { useEffect } from "react";
 import {
   SafeAreaView,
   TouchableOpacity,
@@ -12,19 +12,16 @@ import {
 
 import MyBlur from "../components/MyBlur";
 import itro from "../../assets/itro.png";
-import "firebase/firestore";
-import { getAuth} from "firebase/auth"; 
-import { useNavigation } from "@react-navigation/native";
 
-import { auth } from "../../FirebaseConfig";
-
-
-
-const Welcome = () => {
-  const navigation = useNavigation();
+export default function Welcome({navigation}) {
   const { height } = Dimensions.get("window");
 
- 
+  const handleNavigation = (screenName) => {
+   
+    navigation.navigate(screenName);
+  };
+
+
   return (
     <>
       <MyBlur />
@@ -33,29 +30,41 @@ const Welcome = () => {
           <Image
             source={itro}
             style={{
-              width: "50%",
-              height: height / 10,
-              marginTop: 100,
+              width: "70%",
+              height: height / 8,
+              marginTop: 50,
             }}
           />
           <View style={styles.contentContainer}>
             <Text style={styles.title}>
-              ¿Quieres Recuperarte de una Ruptura?
+              7 Pasos para Recuperarte de una Ruptura
             </Text>
 
             <Text style={styles.title2}>
-              ¿Quieres Comprobar el Interés de tu Ex?
-            </Text>
-
-            <Text style={styles.body}>
-              Aquí encontrarás una guía para lograrlo!
+              y Comprobar el verdadero Interés de tu Ex en la Relación
             </Text>
             <View style={styles.buttonContainer}>
               <TouchableOpacity
-                onPress={()=> navigation.navigate('SignIn')}
+                onPress={() => handleNavigation("VerEpisodios")}
                 style={styles.button2}
               >
-                <Text style={styles.buttonsText}>Ingresa</Text>
+                <Text style={styles.buttonsText}>Ver Videos</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                onPress={() => handleNavigation("HomeScreen")}
+                style={styles.button2}
+              >
+                <Text style={styles.buttonsText}>Mi Desafío 90 Días</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                onPress={() => handleNavigation("MasRecursos")}
+                style={styles.button2}
+              >
+                <Text style={styles.buttonsText}>MasRecursos</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -63,9 +72,9 @@ const Welcome = () => {
       </SafeAreaView>
     </>
   );
-};
+}
 
-export default Welcome;
+
 
 const styles = StyleSheet.create({
   container: {
@@ -86,7 +95,7 @@ const styles = StyleSheet.create({
     fontWeight: "400",
   },
   title: {
-    marginTop: 50,
+    marginTop: 10,
     fontSize: 27,
     fontWeight: "700",
     lineHeight: 25,
@@ -98,15 +107,16 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     textAlign: "center",
     color: "#6d6875",
+    marginBottom:50,
   },
   buttonContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     width: "100%",
     borderWidth: 2,
     borderColor: "white",
     borderRadius: 16,
     backgroundColor: "#DFE3E630",
-    marginTop: 60,
+    marginTop: 20,
   },
   button1: {
     flex: 1,
@@ -118,10 +128,10 @@ const styles = StyleSheet.create({
   button2: {
     flex: 1,
     alignItems: "center",
-    padding: 16,
+    padding: 5,
   },
   buttonsText: {
-    fontWeight: "500",
-    color: "#ff6e01",
+    fontSize: 20,
+    color: "#030303",
   },
 });
