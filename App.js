@@ -3,7 +3,6 @@ import { View, ActivityIndicator } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { onAuthStateChanged } from "firebase/auth";
-
 import Welcome from "./src/screens/Welcome";
 import Registration from "./src/screens/Registration";
 import SignIn from "./src/screens/SignIn";
@@ -14,11 +13,13 @@ import ListasPrimerosPasos from './src/screens/ListasPrimerosPasos'
 import ListasUltimosPasos from './src/screens/ListasUltimosPasos'
 import ListasEspeciales from './src/screens/ListasEspeciales'
 import Formulario from "./src/screens/Formulario";
+import Reproductor from "./src/screens/Reproductor";
+import VideosListasSeleccionados from "./src/screens/VideosListasSeleccionados";
 
 
 import { auth } from "./FirebaseConfig";
 
-// ... Importaciones y constantes ...
+
 
 const Stack = createStackNavigator();
 
@@ -75,6 +76,8 @@ function AuthStack() {
      <Stack.Screen name="ListasEspeciales" component={ListasEspeciales} />
      <Stack.Screen name="MasRecursos" component={MasRecursos} />
      <Stack.Screen name="Formulario" component={Formulario}/>
+     <Stack.Screen name="Reproductor" component={Reproductor}/>
+     <Stack.Screen name="VideosListasSeleccionados" component={VideosListasSeleccionados}/>
   </Stack.Navigator>
 )}
 

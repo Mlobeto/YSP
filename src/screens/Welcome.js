@@ -56,7 +56,7 @@ export default function Welcome({navigation}) {
                 onPress={() => handleNavigation("HomeScreen")}
                 style={styles.button2}
               >
-                <Text style={styles.buttonsText}>Mi Desafío 90 Días</Text>
+                <Text style={styles.buttonsText}>Mi Desafío en 90 Días</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.buttonContainer}>
