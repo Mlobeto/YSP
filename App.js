@@ -15,6 +15,7 @@ import ListasEspeciales from './src/screens/ListasEspeciales'
 import Formulario from "./src/screens/Formulario";
 import Reproductor from "./src/screens/Reproductor";
 import VideosListasSeleccionados from "./src/screens/VideosListasSeleccionados";
+import Favoritos from "./src/screens/Favoritos";
 
 
 import { auth } from "./FirebaseConfig";
@@ -78,6 +79,7 @@ function AuthStack() {
      <Stack.Screen name="Formulario" component={Formulario}/>
      <Stack.Screen name="Reproductor" component={Reproductor}/>
      <Stack.Screen name="VideosListasSeleccionados" component={VideosListasSeleccionados}/>
+     <Stack.Screen name="Favoritos" component={Favoritos}/>
   </Stack.Navigator>
 )}
 

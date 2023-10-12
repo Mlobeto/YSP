@@ -81,6 +81,7 @@ const Registration = ({ navigation }) => {
         gender: formData.gender,
         diasEstrategia: formData.diasEstrategia,
         userId: userCredential.user.uid,
+        videosFavoritos: [],
       });
   
       console.log("Registro en Firestore exitoso");
