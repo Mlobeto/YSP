@@ -32,7 +32,7 @@ export default function SignIn({navigation}){
       signInWithEmailAndPassword(auth, email, password)
         .then(() => {
           console.log('LogIn Exitoso');
-          navigation.navigate('Welcome');
+          navigation.navigate("Welcome");
         })
         .catch((err) => Alert.alert("No pudiste loguearte", err.message));
     }

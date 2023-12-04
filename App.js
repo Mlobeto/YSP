@@ -1,97 +1,123 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, ActivityIndicator } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { onAuthStateChanged } from "firebase/auth";
-import Welcome from "./src/screens/Welcome";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import Ionicons from "react-native-vector-icons/Ionicons";
+
 import Registration from "./src/screens/Registration";
 import SignIn from "./src/screens/SignIn";
+import HomeScreen from "./src/screens/HomeScreen";
 import VerEpisodios from "./src/screens/VerEpisodios";
-import HomeScreen from './src/screens/HomeScreen'
-import MasRecursos from "./src/screens/MasRecursos";
-import ListasPrimerosPasos from './src/screens/ListasPrimerosPasos' 
-import ListasUltimosPasos from './src/screens/ListasUltimosPasos'
-import ListasEspeciales from './src/screens/ListasEspeciales'
-import Formulario from "./src/screens/Formulario";
+import ListasPrimerosPasos from "./src/screens/ListasPrimerosPasos";
+import ListasUltimosPasos from "./src/screens/ListasUltimosPasos";
+import ListasEspeciales from "./src/screens/ListasEspeciales";
 import Reproductor from "./src/screens/Reproductor";
 import VideosListasSeleccionados from "./src/screens/VideosListasSeleccionados";
 import Favoritos from "./src/screens/Favoritos";
-
-
+import SignInChat from "./src/screens/SignInChat";
+import AgendaLlamada from "./src/screens/AgendaLlamada";
+import Welcome from "./src/screens/Welcome"
+import Chat from "./src/screens/Chat"
 import { auth } from "./FirebaseConfig";
 
-
-
 const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
 
-const AuthenticatedUserContext = createContext({ user: null, setUser: () => {} });
+const AuthStack = createStackNavigator();
 
-const AuthenticatedUserProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    console.log("Checking user authentication...");
-
-    const unsubscribe = onAuthStateChanged(auth, async (authenticatedUser) => {
-      try {
-        console.log("onAuthStateChanged triggered");
-        setUser(authenticatedUser || null);
-      } catch (error) {
-        console.error("Error in onAuthStateChanged:", error);
-        setUser(null);
-      }
-    });
-
-    return () => {
-      console.log("Unsubscribing from onAuthStateChanged");
-      unsubscribe();
-    };
-  }, []);
-
+const AuthStackScreen = () => {
   return (
-    <AuthenticatedUserContext.Provider value={{ user, setUser }}>
-      {children}
-    </AuthenticatedUserContext.Provider>
+    <AuthStack.Navigator>
+      <AuthStack.Screen name="SignIn" component={SignIn} />
+      <AuthStack.Screen name="Registration" component={Registration} />
+    </AuthStack.Navigator>
   );
 };
 
-function YSPApp() {
+
+
+const VideosStack = createStackNavigator();
+
+const VideosStackScreen = () => {
   return (
-    <Stack.Navigator initialRouteName="Welcome">
-      <Stack.Screen name="Welcome" component={Welcome} />
-    </Stack.Navigator>
+    <VideosStack.Navigator>
+      <VideosStack.Screen name="VerEpisodios" component={VerEpisodios} />
+      <VideosStack.Screen
+        name="VideosListasSeleccionados"
+        component={VideosListasSeleccionados}
+      />
+      <VideosStack.Screen name="Reproductor" component={Reproductor} />
+      <VideosStack.Screen name="Favoritos" component={Favoritos} />
+    </VideosStack.Navigator>
   );
-}
+};
+
+const AppTabs = () => {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+
+          switch (route.name) {
+            case "Welcome":
+              iconName = focused ? "home" : "home-outline";
+              break;
+            case "Home":
+              iconName = focused ? "ios-list" : "ios-list-outline";
+              break;
+            case "VerEpisodios":
+              iconName = focused ? "videocam" : "videocam-outline";
+              break;
+            case "AgendaLlamada":
+              iconName = focused ? "calendar" : "calendar-outline";
+              break;
+            case "SignInChat":
+              iconName = focused ? "chatbubbles" : "chatbubbles-outline";
+              break;
+            case "VideosListasSeleccionados":
+            case "Reproductor":
+              iconName = "help-circle"; // Puedes cambiar esto según tus necesidades
+              break;
+            default:
+              iconName = "help-circle";
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+      })}
+      tabBarOptions={{
+        tabBarShowLabel: false,
+        tabBarStyle: [
+          {
+            display: "flex",
+          },
+          null,
+        ],
+      }}
+    >
+      <Tab.Screen name="Welcome" component={ Welcome } />
+      <Tab.Screen name="HomeScreen" component={HomeScreen} />
+      <Tab.Screen name="VerEpisodios" component={VideosStackScreen} />
+      <Tab.Screen name="AgendaLlamada" component={AgendaLlamada} />
+      <Tab.Screen name="SignInChat" component={SignInChat} />
+    </Tab.Navigator>
+  );
+};
 
 
-function AuthStack() {
-  return(
-  <Stack.Navigator >
-     <Stack.Screen name="SignIn" component={SignIn} /> 
-     <Stack.Screen name="Welcome" component={Welcome} />
-     <Stack.Screen name="Registration" component={Registration} />
-     <Stack.Screen name="VerEpisodios" component={VerEpisodios} />
-     <Stack.Screen name="HomeScreen" component={HomeScreen} />
-     <Stack.Screen name="ListasPrimerosPasos" component={ListasPrimerosPasos} /> 
-     <Stack.Screen name="ListasUltimosPasos" component={ListasUltimosPasos} />
-     <Stack.Screen name="ListasEspeciales" component={ListasEspeciales} />
-     <Stack.Screen name="MasRecursos" component={MasRecursos} />
-     <Stack.Screen name="Formulario" component={Formulario}/>
-     <Stack.Screen name="Reproductor" component={Reproductor}/>
-     <Stack.Screen name="VideosListasSeleccionados" component={VideosListasSeleccionados}/>
-     <Stack.Screen name="Favoritos" component={Favoritos}/>
-  </Stack.Navigator>
-)}
+
 
 export default function App() {
-  const { user, setUser } = useContext(AuthenticatedUserContext);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("Checking user authentication...");
-    const unsubscribe = onAuthStateChanged(auth, (authenticatedUser) => {
+    const unsubscribe = auth.onAuthStateChanged((authenticatedUser) => {
       try {
-        console.log("onAuthStateChanged triggered");
         setUser(authenticatedUser || null);
         setLoading(false);
       } catch (error) {
@@ -102,7 +128,6 @@ export default function App() {
     });
 
     return () => {
-      console.log("Unsubscribing from onAuthStateChanged");
       unsubscribe();
     };
   }, []);
@@ -116,19 +141,8 @@ export default function App() {
   }
 
   return (
-    <AuthenticatedUserProvider>
-      <NavigationContainer>
-        {user ? <YSPApp /> : <AuthStack />}
-      </NavigationContainer>
-    </AuthenticatedUserProvider>
+    <NavigationContainer>
+      {user ? <AppTabs /> : <AuthStackScreen />}
+    </NavigationContainer>
   );
 }
-
-
-
-
-
-
-
- 
-

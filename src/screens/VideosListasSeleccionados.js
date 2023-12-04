@@ -98,14 +98,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   playlistContainer: {
-    margin: 10,
+    margin: 20,
     alignItems: "center",
   },
   playlistThumbnail: {
     width: 320,
     height: 180,
     borderWidth: 1, // Agrega esta línea
-    borderColor: "red", // Puedes cambiar el color del borde si es necesario
+    borderColor: "white", // Puedes cambiar el color del borde si es necesario
+    marginTop:40,
   },
   playlistTitle: {
     fontSize: 18,

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   SafeAreaView,
   TouchableOpacity,
@@ -13,14 +13,15 @@ import {
 import MyBlur from "../components/MyBlur";
 import itro from "../../assets/itro.png";
 
-export default function Welcome({navigation}) {
+export default function Welcome({ navigation }) {
+  console.log("Welcome component rendered");
   const { height } = Dimensions.get("window");
 
   const handleNavigation = (screenName) => {
-   
+    console.log("Navigating to:", screenName);
     navigation.navigate(screenName);
   };
-
+  
 
   return (
     <>
@@ -43,37 +44,17 @@ export default function Welcome({navigation}) {
             <Text style={styles.title2}>
               y Comprobar el verdadero Interés de tu Ex en la Relación
             </Text>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                onPress={() => handleNavigation("VerEpisodios")}
-                style={styles.button2}
-              >
-                <Text style={styles.buttonsText}>Ver Videos</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                onPress={() => handleNavigation("HomeScreen")}
-                style={styles.button2}
-              >
-                <Text style={styles.buttonsText}>Mi Desafío en 90 Días</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                onPress={() => handleNavigation("MasRecursos")}
-                style={styles.button2}
-              >
-                <Text style={styles.buttonsText}>MasRecursos</Text>
-              </TouchableOpacity>
-            </View>
+
+           
           </View>
         </ScrollView>
       </SafeAreaView>
     </>
   );
 }
-
+Welcome.navigationOptions = {
+  headerShown: false,
+};
 
 
 const styles = StyleSheet.create({

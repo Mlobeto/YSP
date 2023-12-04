@@ -10,12 +10,14 @@ import {
   Button
 } from "react-native";
 import Svg, { Circle, Text as SvgText } from "react-native-svg";
+import { StatusBar } from 'expo-status-bar';
 import MyBlurDos from "../components/MyBlurDos";
 import { AntDesign } from "@expo/vector-icons";
 import Animated, {useSharedValue, useAnimatedProps, withTiming} from 'react-native-reanimated'
 import Desafio from "../components/Desafio";
 import { auth, database } from "../../FirebaseConfig";
 import { getDoc, doc, updateDoc } from "firebase/firestore";
+
 
 export default function HomeScreen ({navigation}){
   const [userInfo, setUserInfo] = useState(null);
@@ -91,6 +93,7 @@ fetchUserInfo();
   return (
     <>
       <MyBlurDos />
+      <StatusBar hidden={true} />
        <SafeAreaView style={styles.container}>
        <Text style={styles.title}>
           {userInfo ? `Hola Querid@ ${userInfo.firstName}. Llevas ${userInfo.diasEstrategia} días aplicando la estrategia` : "Bienvenid@. Cargando información..."}
@@ -106,9 +109,9 @@ fetchUserInfo();
           
           <TouchableOpacity
             style={styles.button2}
-            onPress={() => handleNavigation("Formulario")}
+            onPress={() => handleNavigation("PasoxPaso")}
           >
-            <Text style={styles.signInButton}>Repasar mi Estrategia</Text>
+            <Text style={styles.signInButton}>Repasar la Estrategia</Text>
           </TouchableOpacity>
         </View>  
        
