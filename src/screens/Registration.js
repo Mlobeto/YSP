@@ -8,17 +8,22 @@ import {
   Text,
   View,
   Alert,
-  Dimensions,
+  Dimensions, 
+  Image,
+ 
+  Platform
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import MyBlur from "../components/MyBlur";
 
+import fondochat from '../../assets/fondochat.png';
+import logo500 from '../../assets/logo500.png';
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
 } from "firebase/auth";
-import { collection, addDoc, doc, setDoc  } from "firebase/firestore";
+import { collection, addDoc, doc, setDoc } from "firebase/firestore";
 import { auth, database } from "../../FirebaseConfig";
+import PhoneInput from "react-native-phone-input";
 
 const Registration = ({ navigation }) => {
   const { height } = Dimensions.get("window");
@@ -28,12 +33,17 @@ const Registration = ({ navigation }) => {
     confirmPassword: "",
     firstName: "",
     lastName: "",
+    phone:"",
     gender: "",
     diasEstrategia: "",
   });
 
   const handleChangeText = (fieldName, value) => {
-    setFormData({ ...formData, [fieldName]: value });
+    if (fieldName === "phone") {
+      setFormData({ ...formData, phone: value });
+    } else {
+      setFormData({ ...formData, [fieldName]: value });
+    }
   };
 
   const validateForm = () => {
@@ -59,35 +69,39 @@ const Registration = ({ navigation }) => {
 
   const handleRegistration = async () => {
     try {
+      const countryCode = this.phoneInput.getCountryCode();
       console.log("Registrando usuario en Firebase Auth");
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         formData.email,
         formData.password
       );
-  
+
       console.log("Registro exitoso");
       console.log("UID del usuario autenticado:", userCredential.user.uid);
-  
+
       console.log("Guardando datos adicionales en Firestore");
-  
+
       // Utilizar el mismo UID del usuario como ID del documento
       const userDocRef = doc(database, "users", userCredential.user.uid);
-  
+
       await setDoc(userDocRef, {
         email: formData.email,
         firstName: formData.firstName,
         lastName: formData.lastName,
+        phone: formData.phone,
+        countryCode: countryCode,
         gender: formData.gender,
         diasEstrategia: formData.diasEstrategia,
         userId: userCredential.user.uid,
         videosFavoritos: [],
+        isMember: false, 
       });
-  
+
       console.log("Registro en Firestore exitoso");
-  
-      // Puedes agregar lógica adicional aquí si es necesario
-  
+
+    
+
       Alert.alert(
         "Registro Exitoso",
         "Por favor, revise su correo electrónico para completar el proceso de registro.",
@@ -95,7 +109,7 @@ const Registration = ({ navigation }) => {
           {
             text: "Ok",
             onPress: () => {
-              // Redirigir al usuario a la pantalla de inicio de sesión
+             
               navigation.navigate("SignIn");
             },
           },
@@ -104,21 +118,26 @@ const Registration = ({ navigation }) => {
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
         console.log("La dirección de correo electrónico ya está en uso.");
-        // Puedes mostrar un mensaje al usuario aquí
+       
       } else {
         console.error("Error de registro:", error);
       }
     }
   };
-  
 
   return (
-    <>
-      <MyBlur />
+    
+    <View style={styles.container}>
+     <Image source={fondochat} style={styles.background} />
+    
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.container}>
-          <View style={styles.contentContainer}>
-            <Text style={styles.title}>Registrate</Text>
+         
+          <View style={styles.innerContainer}>
+        {/* Include Logo */}
+        <Image source={logo500} style={styles.logo} />
+
+           
             <TextInput
               value={formData.email}
               style={styles.input}
@@ -163,14 +182,20 @@ const Registration = ({ navigation }) => {
               onChangeText={(text) => handleChangeText("lastName", text)}
               autoCorrect={false}
             />
-            <Text>Género:</Text>
+            <PhoneInput
+              ref={(ref) => (this.phoneInput = ref)}
+              initialCountry="us"
+              onChangePhoneNumber={(value) => handleChangeText("phone", value)}
+              textStyle={{ fontSize: 18 }}
+            />
+            
             <Picker
               selectedValue={formData.gender}
               onValueChange={(itemValue) =>
                 handleChangeText("gender", itemValue)
               }
             >
-              <Picker.Item label="Selecciona" value="" />
+              <Picker.Item label="Genero" value="" />
               <Picker.Item label="Masculino" value="Masculino" />
               <Picker.Item label="Femenino" value="Femenino" />
               <Picker.Item label="Otro" value="Otro" />
@@ -186,7 +211,7 @@ const Registration = ({ navigation }) => {
               <TouchableOpacity
                 onPress={() => {
                   handleRegistration();
-                  // No es necesario navegar a SignIn aquí, ya que el redireccionamiento ocurre después de un registro exitoso
+                  
                 }}
                 style={styles.signInButton}
               >
@@ -196,7 +221,9 @@ const Registration = ({ navigation }) => {
           </View>
         </ScrollView>
       </SafeAreaView>
-    </>
+      </View>
+
+   
   );
 };
 export default Registration;
@@ -204,77 +231,53 @@ export default Registration;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    width: "100%",
-    alignItems: "center",
-    backgroundColor: "transparent",
-    justifyContent: "center",
+    width: '100%',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
   },
   contentContainer: {
     paddingHorizontal: 30,
+    marginTop: -68, // Adjust this value as needed to match the desired spacing
+  },
+  background: {
+    height: 130, // Set the height based on your design preferences
+    width: '100%',
+    position: 'absolute',
+    top: 0,
+  },
+  logo: {
+    height: 100,
+    width: 100,
+    marginTop: 0,
+  },
+  innerContainer: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'white',
+    borderTopLeftRadius: 80,
     marginTop: 50,
-  },
-  body: {
-    padding: 20,
-    textAlign: "center",
-    fontSize: 16,
-    color: "#6d6875",
-    lineHeight: 30,
-    fontWeight: "400",
-  },
-  title: {
-    marginTop: 50,
-    fontSize: 27,
-    fontWeight: "700",
-    lineHeight: 25,
-    textAlign: "center",
-    color: "#6d6875",
-  },
-  title2: {
-    fontSize: 23,
-    fontWeight: "500",
-    textAlign: "center",
-    color: "#6d6875",
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    width: "100%",
-
-    backgroundColor: "#DFE3E630",
-    marginTop: 60,
-  },
-  button1: {
     flex: 1,
-    alignItems: "center",
-    backgroundColor: "#ffffff70",
-    padding: 16,
-    borderRadius: 6,
-    borderWidth: 2,
-    borderColor: "white",
-    borderRadius: 16,
-    marginHorizontal: 10,
-  },
-  button2: {
-    flex: 1,
-    alignItems: "center",
-    padding: 16,
-  },
-  buttonsText: {
-    fontWeight: "500",
-    color: "#ff6e01",
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingTop: 6,
+    paddingHorizontal: 6,
+    paddingBottom: 6,
+    flexDirection: 'column',
   },
   input: {
-    backgroundColor: "#F7F7F7",
+    backgroundColor: '#F7F7F7',
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
   },
   signInButton: {
-    backgroundColor: "#00b4d8",
+    backgroundColor: '#00b4d8',
     padding: 20,
     borderRadius: 12,
-    alignItems: "center",
+    alignItems: 'center',
     marginVertical: 30,
-    shadowColor: "#00b4d8",
+    shadowColor: '#00b4d8',
     shadowOffset: {
       width: 0,
       height: 8,

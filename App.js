@@ -7,18 +7,18 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 
 import Registration from "./src/screens/Registration";
 import SignIn from "./src/screens/SignIn";
-import HomeScreen from "./src/screens/HomeScreen";
 import VerEpisodios from "./src/screens/VerEpisodios";
-import ListasPrimerosPasos from "./src/screens/ListasPrimerosPasos";
-import ListasUltimosPasos from "./src/screens/ListasUltimosPasos";
-import ListasEspeciales from "./src/screens/ListasEspeciales";
+import Estrategia from "./src/screens/Estrategia";
 import Reproductor from "./src/screens/Reproductor";
 import VideosListasSeleccionados from "./src/screens/VideosListasSeleccionados";
 import Favoritos from "./src/screens/Favoritos";
 import SignInChat from "./src/screens/SignInChat";
+import ChatPerfil from "./src/screens/ChatPerfil";
+import SalasChat from "./src/screens/SalasChat";
+import ArgChat from "./src/screens/chats/ArgChat"
 import AgendaLlamada from "./src/screens/AgendaLlamada";
-import Welcome from "./src/screens/Welcome"
-import Chat from "./src/screens/Chat"
+import Home from "./src/screens/Home"
+
 import { auth } from "./FirebaseConfig";
 
 const Stack = createStackNavigator();
@@ -30,8 +30,12 @@ const AuthStack = createStackNavigator();
 const AuthStackScreen = () => {
   return (
     <AuthStack.Navigator>
-      <AuthStack.Screen name="SignIn" component={SignIn} />
-      <AuthStack.Screen name="Registration" component={Registration} />
+      <AuthStack.Screen name="SignIn" component={SignIn} options={{ headerShown: false }}  />
+      <AuthStack.Screen name="Registration" component={Registration} options={{ headerShown: false }}  />
+      <AuthStack.Screen name="Home" component={Home}  options={{ headerShown: false }} />
+      <AuthStack.Screen name="VerEpisodios" component={VerEpisodios} options={{ headerShown: false }}  />
+      <AuthStack.Screen name="SignInChat" component={SignInChat} options={{ headerShown: false }}  />
+      
     </AuthStack.Navigator>
   );
 };
@@ -43,7 +47,7 @@ const VideosStack = createStackNavigator();
 const VideosStackScreen = () => {
   return (
     <VideosStack.Navigator>
-      <VideosStack.Screen name="VerEpisodios" component={VerEpisodios} />
+      <VideosStack.Screen name="VerEpisodios" component={VerEpisodios}options={{ headerShown: false }} />
       <VideosStack.Screen
         name="VideosListasSeleccionados"
         component={VideosListasSeleccionados}
@@ -54,6 +58,20 @@ const VideosStackScreen = () => {
   );
 };
 
+const ChatStack = createStackNavigator();
+
+const ChatStackScreen = () => {
+  return (
+    <ChatStack.Navigator>
+      <ChatStack.Screen name="SignInChat" component={SignInChat} options={{ headerShown: false }} />
+      <ChatStack.Screen name="ChatPerfil" component={ChatPerfil}options={{ headerShown: false }} />
+      <ChatStack.Screen name="SalasChat" component={SalasChat} options={{ headerShown: false }}/>
+      <ChatStack.Screen name="ArgChat" component={ArgChat} options={{ headerShown: false }}/>
+      {/* Agrega más pantallas según sea necesario */}
+    </ChatStack.Navigator>
+  );
+  }
+
 const AppTabs = () => {
   return (
     <Tab.Navigator
@@ -63,10 +81,10 @@ const AppTabs = () => {
           let iconName;
 
           switch (route.name) {
-            case "Welcome":
+            case "Home":
               iconName = focused ? "home" : "home-outline";
               break;
-            case "Home":
+            case "Estrategia":
               iconName = focused ? "ios-list" : "ios-list-outline";
               break;
             case "VerEpisodios":
@@ -77,10 +95,6 @@ const AppTabs = () => {
               break;
             case "SignInChat":
               iconName = focused ? "chatbubbles" : "chatbubbles-outline";
-              break;
-            case "VideosListasSeleccionados":
-            case "Reproductor":
-              iconName = "help-circle"; // Puedes cambiar esto según tus necesidades
               break;
             default:
               iconName = "help-circle";
@@ -99,11 +113,14 @@ const AppTabs = () => {
         ],
       }}
     >
-      <Tab.Screen name="Welcome" component={ Welcome } />
-      <Tab.Screen name="HomeScreen" component={HomeScreen} />
+      
+      <Tab.Screen name="Home" component={Home} />
+      <Tab.Screen name="Estrategia" component={ Estrategia } />
       <Tab.Screen name="VerEpisodios" component={VideosStackScreen} />
       <Tab.Screen name="AgendaLlamada" component={AgendaLlamada} />
-      <Tab.Screen name="SignInChat" component={SignInChat} />
+      <Tab.Screen name="Chat" component={ChatStackScreen} />
+      
+
     </Tab.Navigator>
   );
 };

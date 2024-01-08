@@ -19,7 +19,7 @@ import { auth, database } from "../../FirebaseConfig";
 import { getDoc, doc, updateDoc } from "firebase/firestore";
 
 
-export default function HomeScreen ({navigation}){
+export default function Estrategia ({navigation}){
   const [userInfo, setUserInfo] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false)
   

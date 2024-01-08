@@ -35,7 +35,7 @@
       )
      return(
          <Canvas style = {{width:'100%', height:'100%', position: 'absolute'}}>
-         <Fill color={'#e5e8ef'}/>
+         <Fill color={'#ffffff'}/>
          <Circle c={c} r={radius}>
          <LinearGradient
          start={start}

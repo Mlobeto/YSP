@@ -1,12 +1,12 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-const ListasPrimerosPasos = () => {
+const AdminChat = () => {
   return (
     <View>
-      <Text>ListasPrimerosPasos</Text>
+      <Text>AdminChat</Text>
     </View>
   )
 }
 
-export default ListasPrimerosPasos
+export default AdminChat

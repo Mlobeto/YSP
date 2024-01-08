@@ -11,10 +11,12 @@ import {
 } from "react-native";
 
 import MyBlur from "../components/MyBlur";
-import itro from "../../assets/itro.png";
+import logo500 from '../../assets/logo500.png';
+import fondochat from "../../assets/fondochat.png";
 
-export default function Welcome({ navigation }) {
-  console.log("Welcome component rendered");
+export default function Home({ navigation }) {
+  const screenWidth = Math.round(Dimensions.get('window').width);
+  console.log("Home component rendered");
   const { height } = Dimensions.get("window");
 
   const handleNavigation = (screenName) => {
@@ -27,15 +29,12 @@ export default function Welcome({ navigation }) {
     <>
       <MyBlur />
       <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.container}>
-          <Image
-            source={itro}
-            style={{
-              width: "70%",
-              height: height / 8,
-              marginTop: 50,
-            }}
-          />
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Image source={fondochat} resizeMode='cover' style={{ height: 130, width: screenWidth }} />
+        <View style={styles.innerContainer}>
+          <Image source={logo500} style={styles.logo} />
+          {/* Otras secciones del contenido */}
+        </View>
           <View style={styles.contentContainer}>
             <Text style={styles.title}>
               7 Pasos para Recuperarte de una Ruptura
@@ -52,7 +51,7 @@ export default function Welcome({ navigation }) {
     </>
   );
 }
-Welcome.navigationOptions = {
+Home.navigationOptions = {
   headerShown: false,
 };
 
@@ -60,12 +59,14 @@ Welcome.navigationOptions = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    backgroundColor: "transparent",
+    width: '100%',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
   },
   contentContainer: {
-    paddingHorizontal: 30,
-    marginTop: 50,
+    paddingHorizontal: 10,
+    marginTop: 10,
   },
   body: {
     paddingTop: 40,
@@ -76,19 +77,42 @@ const styles = StyleSheet.create({
     fontWeight: "400",
   },
   title: {
-    marginTop: 10,
-    fontSize: 27,
-    fontWeight: "700",
-    lineHeight: 25,
-    textAlign: "center",
-    color: "#6d6875",
-  },
-  title2: {
-    fontSize: 23,
+    fontSize: 20,
     fontWeight: "500",
     textAlign: "center",
+    marginBottom: 0,
     color: "#6d6875",
-    marginBottom:50,
+    marginBottom: 20
+  ,
+  },
+  innerContainer: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'white',
+    borderTopLeftRadius: 80,
+    marginTop: -70,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingTop: 6,
+    paddingHorizontal: 6,
+    paddingBottom: 6,
+    flexDirection: 'column',
+  },
+  logo: {
+    height: 100,
+    width: 100,
+    marginTop: 0,
+   
+  },
+  title2: {
+    fontSize: 20,
+    fontWeight: "500",
+    textAlign: "center",
+    marginBottom: 0,
+    color: "#6d6875",
+    marginBottom: 20
+  ,
   },
   buttonContainer: {
     flexDirection: 'row',
